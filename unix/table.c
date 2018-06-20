@@ -18,6 +18,8 @@ struct uiTable {
 	// TODO document this properly
 	GHashTable *indeterminatePositions;
 	guint indeterminateTimer;
+	void (*onRowActivated)(uiTable *, int, void *);
+	void *onRowActivatedData;
 };
 
 // use the same size as GtkFileChooserWidget's treeview
@@ -494,6 +496,25 @@ static void uiTableDestroy(uiControl *c)
 	uiFreeControl(uiControl(t));
 }
 
+static void onRowActivated(GtkTreeView *tv, GtkTreePath *path, GtkTreeViewColumn *col, gpointer data)
+{
+	uiTable *table = uiTable(data);
+	gint row = gtk_tree_path_get_indices(path)[0];
+
+	(*(table->onRowActivated))(table, row, table->onRowActivatedData);
+}
+
+static void defaultOnRowActivated(uiTable *table, int row, void *data)
+{
+	// do nothing
+}
+
+void uiTableOnRowActivated(uiTable *t, void (*f)(uiTable *, int, void *), void *data)
+{
+	t->onRowActivated = f;
+	t->onRowActivatedData = data;
+}
+
 uiTable *uiNewTable(uiTableParams *p)
 {
 	uiTable *t;
@@ -511,7 +532,10 @@ uiTable *uiNewTable(uiTableParams *p)
 
 	t->treeWidget = gtk_tree_view_new_with_model(GTK_TREE_MODEL(t->model));
 	t->tv = GTK_TREE_VIEW(t->treeWidget);
+
 	// TODO set up t->tv
+	uiTableOnRowActivated(t, defaultOnRowActivated, NULL);
+	g_signal_connect(t->tv, "row-activated", G_CALLBACK(onRowActivated), t);
 
 	gtk_container_add(t->scontainer, t->treeWidget);
 	// and make the tree view visible; only the scrolled window's visibility is controlled by libui

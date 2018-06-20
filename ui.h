@@ -1455,6 +1455,9 @@ _UI_EXTERN void uiTableAppendButtonColumn(uiTable *t,
 	int buttonModelColumn,
 	int buttonClickableModelColumn);
 
+// uiTableOnRowActivated provides a callback for a double click on a row
+_UI_EXTERN void uiTableOnRowActivated(uiTable *t, void (*f)(uiTable *, int, void *), void *data);
+
 // uiNewTable() creates a new uiTable with the specified parameters.
 _UI_EXTERN uiTable *uiNewTable(uiTableParams *params);
 

@@ -40,6 +40,8 @@ struct uiTable {
 	HWND edit;
 	int editedItem;
 	int editedSubitem;
+	void (*onRowActivated)(uiTable *, int, void *);
+	void *onRowActivatedData;
 };
 extern int uiprivTableProgress(uiTable *t, int item, int subitem, int modelColumn, LONG *pos);
 

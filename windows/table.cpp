@@ -278,6 +278,17 @@ static BOOL onWM_NOTIFY(uiControl *c, HWND hwnd, NMHDR *nmhdr, LRESULT *lResult)
 		}
 		return TRUE;
 #endif
+	case NM_DBLCLK:
+		{
+			LVHITTESTINFO ht = {};
+			ht.pt = ((NMITEMACTIVATE *)nmhdr)->ptAction;
+
+			if (ListView_SubItemHitTest(t->hwnd, &ht) == -1)
+				return FALSE;
+
+			(*(t->onRowActivated))(t, ht.iItem, t->onRowActivatedData);
+			return TRUE;
+		}
 	case LVN_ITEMCHANGED:
 		{
 			NMLISTVIEW *nm = (NMLISTVIEW *) nmhdr;
@@ -479,6 +490,17 @@ void uiTableAppendButtonColumn(uiTable *t, const char *name, int buttonModelColu
 	p->buttonClickableModelColumn = buttonClickableModelColumn;
 }
 
+static void defaultOnRowActivated(uiTable *table, int row, void *data)
+{
+	// do nothing
+}
+
+void uiTableOnRowActivated(uiTable *t, void (*f)(uiTable *, int, void *), void *data)
+{
+	t->onRowActivated = f;
+	t->onRowActivatedData = data;
+}
+
 uiTable *uiNewTable(uiTableParams *p)
 {
 	uiTable *t;
@@ -499,6 +521,7 @@ uiTable *uiNewTable(uiTableParams *p)
 		TRUE);
 	t->model->tables->push_back(t);
 	uiWindowsRegisterWM_NOTIFYHandler(t->hwnd, onWM_NOTIFY, uiControl(t));
+	uiTableOnRowActivated(t, defaultOnRowActivated, NULL);
 
 	// TODO: try LVS_EX_AUTOSIZECOLUMNS
 	// TODO check error

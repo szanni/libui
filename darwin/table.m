@@ -16,9 +16,32 @@
 	uiTableModel *uiprivM;
 }
 - (id)initWithFrame:(NSRect)r uiprivT:(uiTable *)t uiprivM:(uiTableModel *)m;
+- (IBAction)onDoubleAction:(id)sender;
 @end
 
 @implementation uiprivTableView
+
+- (IBAction)onDoubleAction:(id)sender
+{
+	uiTable *table = self->uiprivT;
+	NSInteger row = [self clickedRow];
+
+	if (row < 0)
+		return;
+
+	(*(table->onRowActivated))(table, row, table->onRowActivatedData);
+}
+
+static void defaultOnRowActivated(uiTable *table, int row, void *data)
+{
+	// do nothing
+}
+
+void uiTableOnRowActivated(uiTable *t, void (*f)(uiTable *, int, void *), void *data)
+{
+	t->onRowActivated = f;
+	t->onRowActivatedData = data;
+}
 
 - (id)initWithFrame:(NSRect)r uiprivT:(uiTable *)t uiprivM:(uiTableModel *)m
 {
@@ -197,6 +220,9 @@ uiTable *uiNewTable(uiTableParams *p)
 	[t->tv setGridStyleMask:NSTableViewGridNone];
 	[t->tv setAllowsTypeSelect:YES];
 	// TODO floatsGroupRows — do we even allow group rows?
+
+	uiTableOnRowActivated(t, defaultOnRowActivated, NULL);
+	[t->tv setDoubleAction: @selector(onDoubleAction:)];
 
 	memset(&sp, 0, sizeof (uiprivScrollViewCreateParams));
 	sp.DocumentView = t->tv;
