@@ -1385,6 +1385,12 @@ struct uiTableParams {
 	int RowBackgroundColorModelColumn;
 };
 
+_UI_ENUM(uiSortType) {
+	uiSortAscending,
+	uiSortDescending,
+	uiSortNone,
+};
+
 // uiTable is a uiControl that shows tabular data, allowing users to
 // manipulate rows of such data at a time.
 typedef struct uiTable uiTable;
