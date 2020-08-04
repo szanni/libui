@@ -18,6 +18,8 @@ struct uiTable {
 	// TODO document this properly
 	GHashTable *indeterminatePositions;
 	guint indeterminateTimer;
+	void (*columnHeaderOnClicked)(uiTable *, int, void *);
+	void *columnHeaderOnClickedData;
 };
 
 // use the same size as GtkFileChooserWidget's treeview
@@ -327,6 +329,74 @@ static void buttonColumnClicked(GtkCellRenderer *r, gchar *pathstr, gpointer dat
 	onEdited(p->m, p->modelColumn, pathstr, NULL, NULL);
 }
 
+unsigned uiprivTableColumnLogicalToReal(uiTable *t, int lcol)
+{
+	unsigned rcol;
+
+	for (rcol = 0; rcol < gtk_tree_view_get_n_columns(t->tv); ++rcol) {
+		GtkTreeViewColumn *c = gtk_tree_view_get_column(t->tv, rcol);
+		if (gtk_tree_view_column_get_sort_column_id(c) == lcol)
+			return rcol;
+	}
+
+	return 0;
+}
+
+uiSortType uiTableColumnGetSortOrder(uiTable *t, int lcol)
+{
+	unsigned rcol = uiprivTableColumnLogicalToReal(t, lcol);
+	GtkTreeViewColumn *c = gtk_tree_view_get_column(t->tv, rcol);
+
+	if (c == NULL || gtk_tree_view_column_get_sort_indicator(c) == FALSE)
+		return uiSortNone;
+
+	if (gtk_tree_view_column_get_sort_order(c) == GTK_SORT_ASCENDING)
+		return uiSortAscending;
+	else
+		return uiSortDescending;
+}
+
+void uiTableColumnSetSortOrder(uiTable *t, int lcol, uiSortType order)
+{
+	unsigned rcol = uiprivTableColumnLogicalToReal(t, lcol);
+	GtkTreeViewColumn *c = gtk_tree_view_get_column(t->tv, rcol);
+
+	if (c == NULL)
+		return;
+
+	if (order == uiSortNone) {
+		gtk_tree_view_column_set_sort_indicator(c, FALSE);
+		return;
+	}
+
+	gtk_tree_view_column_set_sort_indicator(c, TRUE);
+	if (order == uiSortAscending)
+		gtk_tree_view_column_set_sort_order(c, GTK_SORT_ASCENDING);
+	else
+		gtk_tree_view_column_set_sort_order(c, GTK_SORT_DESCENDING);
+}
+
+void uiTableColumnHeaderOnClicked(uiTable *t, void (*f)(uiTable *, int, void *), void *data)
+{
+	t->columnHeaderOnClicked = f;
+	t->columnHeaderOnClickedData = data;
+}
+
+static void defaultColumnHeaderOnClicked(uiTable *table, int column, void *data)
+{
+	// do nothing
+}
+
+static void columnHeaderOnClicked(GtkTreeViewColumn *c, gpointer data)
+{
+	uiTable *t = uiTable(data);
+
+	printf("Clicked logical column: %d\n", gtk_tree_view_column_get_sort_column_id(c));
+
+	t->columnHeaderOnClicked(t, gtk_tree_view_column_get_sort_column_id(c), t->columnHeaderOnClickedData);
+
+}
+
 static GtkTreeViewColumn *addColumn(uiTable *t, const char *name)
 {
 	GtkTreeViewColumn *c;
@@ -335,6 +405,10 @@ static GtkTreeViewColumn *addColumn(uiTable *t, const char *name)
 	gtk_tree_view_column_set_resizable(c, TRUE);
 	gtk_tree_view_column_set_title(c, name);
 	gtk_tree_view_append_column(t->tv, c);
+	gtk_tree_view_column_set_sort_column_id(c, gtk_tree_view_get_n_columns(t->tv)-1);
+	uiTableColumnHeaderOnClicked(t, defaultColumnHeaderOnClicked, NULL);
+	g_signal_connect(c, "clicked", G_CALLBACK(columnHeaderOnClicked), t);
+	gtk_tree_view_column_set_reorderable(c, TRUE);
 	return c;
 }
 
