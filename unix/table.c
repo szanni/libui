@@ -18,6 +18,7 @@ struct uiTable {
 	// TODO document this properly
 	GHashTable *indeterminatePositions;
 	guint indeterminateTimer;
+	gboolean columnHeadersReorderable;
 };
 
 // use the same size as GtkFileChooserWidget's treeview
@@ -334,6 +335,8 @@ static GtkTreeViewColumn *addColumn(uiTable *t, const char *name)
 	c = gtk_tree_view_column_new();
 	gtk_tree_view_column_set_resizable(c, TRUE);
 	gtk_tree_view_column_set_title(c, name);
+	if (uiTableColumnHeadersReorderable(t))
+		gtk_tree_view_column_set_reorderable(c, 1);
 	gtk_tree_view_append_column(t->tv, c);
 	return c;
 }
@@ -477,6 +480,24 @@ void uiTableAppendButtonColumn(uiTable *t, const char *name, int buttonModelColu
 	g_ptr_array_add(t->columnParams, p);
 }
 
+int uiTableColumnHeadersReorderable(uiTable *t)
+{
+	return t->columnHeadersReorderable;
+}
+
+void uiTableColumnHeadersSetReorderable(uiTable *t, int reorderable)
+{
+	GtkTreeViewColumn *tc;
+	guint i;
+
+	t->columnHeadersReorderable = reorderable;
+
+	for (i = 0; i < gtk_tree_view_get_n_columns(t->tv); ++i) {
+		tc = gtk_tree_view_get_column(t->tv, i);
+		gtk_tree_view_column_set_reorderable(tc, reorderable);
+	}
+}
+
 uiUnixControlAllDefaultsExceptDestroy(uiTable)
 
 static void uiTableDestroy(uiControl *c)
@@ -503,6 +524,7 @@ uiTable *uiNewTable(uiTableParams *p)
 	t->model = p->Model;
 	t->columnParams = g_ptr_array_new();
 	t->backgroundColumn = p->RowBackgroundColorModelColumn;
+	t->columnHeadersReorderable = 0;
 
 	t->widget = gtk_scrolled_window_new(NULL, NULL);
 	t->scontainer = GTK_CONTAINER(t->widget);
