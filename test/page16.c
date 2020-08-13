@@ -27,6 +27,7 @@ static int modelNumRows(uiTableModelHandler *mh, uiTableModel *m)
 static uiImage *img[2];
 static char row9text[1024];
 static int yellowRow = -1;
+static int greenRow = -1;
 static int checkStates[15];
 
 static uiTableValue *modelCellValue(uiTableModelHandler *mh, uiTableModel *m, int row, int col)
@@ -36,6 +37,8 @@ static uiTableValue *modelCellValue(uiTableModelHandler *mh, uiTableModel *m, in
 	if (col == 3) {
 		if (row == yellowRow)
 			return uiNewTableValueColor(1, 1, 0, 1);
+		if (row == greenRow)
+			return uiNewTableValueColor(0, 1, 0, 1);
 		if (row == 3)
 			return uiNewTableValueColor(1, 0, 0, 1);
 		if (row == 11)
@@ -98,6 +101,17 @@ static void modelSetCellValue(uiTableModelHandler *mh, uiTableModel *m, int row,
 		checkStates[row] = uiTableValueInt(val);
 }
 
+static void onRowActivated(uiTable *t, int row, void *data)
+{
+	int prev = greenRow;
+	uiTableModel *m = data;
+
+	greenRow = row;
+	if (prev != -1)
+		uiTableModelRowChanged(m, prev);
+	uiTableModelRowChanged(m, greenRow);
+}
+
 static uiTableModel *m;
 
 uiBox *makePage16(void)
@@ -151,6 +165,8 @@ uiBox *makePage16(void)
 
 	uiTableAppendProgressBarColumn(t, "Progress Bar",
 		8);
+
+	uiTableOnRowActivated(t, onRowActivated, m);
 
 	return page16;
 }
