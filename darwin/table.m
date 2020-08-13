@@ -170,6 +170,16 @@ static void uiTableDestroy(uiControl *c)
 	uiFreeControl(uiControl(t));
 }
 
+void uiTableColumnHeadersSetReorderable(uiTable *t, int reorderable)
+{
+	[t->tv setAllowsColumnReordering:(BOOL)reorderable];
+}
+
+int uiTableColumnHeadersReorderable(uiTable *t)
+{
+	return [t->tv allowsColumnReordering];
+}
+
 uiTable *uiNewTable(uiTableParams *p)
 {
 	uiTable *t;
