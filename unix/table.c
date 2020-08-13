@@ -390,9 +390,6 @@ static void defaultColumnHeaderOnClicked(uiTable *table, int column, void *data)
 static void columnHeaderOnClicked(GtkTreeViewColumn *c, gpointer data)
 {
 	uiTable *t = uiTable(data);
-
-	printf("Clicked logical column: %d\n", gtk_tree_view_column_get_sort_column_id(c));
-
 	t->columnHeaderOnClicked(t, gtk_tree_view_column_get_sort_column_id(c), t->columnHeaderOnClickedData);
 
 }
@@ -408,7 +405,6 @@ static GtkTreeViewColumn *addColumn(uiTable *t, const char *name)
 	gtk_tree_view_column_set_sort_column_id(c, gtk_tree_view_get_n_columns(t->tv)-1);
 	uiTableColumnHeaderOnClicked(t, defaultColumnHeaderOnClicked, NULL);
 	g_signal_connect(c, "clicked", G_CALLBACK(columnHeaderOnClicked), t);
-	gtk_tree_view_column_set_reorderable(c, TRUE);
 	return c;
 }
 
