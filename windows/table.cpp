@@ -479,6 +479,17 @@ void uiTableAppendButtonColumn(uiTable *t, const char *name, int buttonModelColu
 	p->buttonClickableModelColumn = buttonClickableModelColumn;
 }
 
+void uiTableColumnHeadersSetReorderable(uiTable *t, int reorderable)
+{
+	DWORD param = (reorderable) ? LVS_EX_HEADERDRAGDROP : 0;
+	ListView_SetExtendedListViewStyleEx(t->hwnd, LVS_EX_HEADERDRAGDROP, param);
+}
+
+int uiTableColumnHeadersReorderable(uiTable *t)
+{
+	return ((ListView_GetExtendedListViewStyle(t->hwnd) & LVS_EX_HEADERDRAGDROP) != 0);
+}
+
 uiTable *uiNewTable(uiTableParams *p)
 {
 	uiTable *t;
