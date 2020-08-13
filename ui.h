@@ -1455,6 +1455,15 @@ _UI_EXTERN void uiTableAppendButtonColumn(uiTable *t,
 	int buttonModelColumn,
 	int buttonClickableModelColumn);
 
+// uiTableColumnHeadersReorderable() returns if column headers in t
+// can be reordered or not
+_UI_EXTERN int uiTableColumnHeadersReorderable(uiTable *t);
+
+// uiTableColumnHeadersSetReorderable() sets if the column headers in t
+// can be reordered or not
+_UI_EXTERN void uiTableColumnHeadersSetReorderable(uiTable *t,
+	int reorderable);
+
 // uiNewTable() creates a new uiTable with the specified parameters.
 _UI_EXTERN uiTable *uiNewTable(uiTableParams *params);
 
