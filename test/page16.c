@@ -102,7 +102,7 @@ static uiTableModel *m;
 
 static void columnHeaderOnClicked(uiTable *t, int c, void *data)
 {
-	if (uiTableColumnGetSortOrder(t, c) == uiSortAscending)
+	if (uiTableColumnSortOrder(t, c) == uiSortAscending)
 		uiTableColumnSetSortOrder(t, c, uiSortDescending);
 	else
 		uiTableColumnSetSortOrder(t, c, uiSortAscending);

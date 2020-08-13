@@ -255,7 +255,7 @@ void uiTableColumnSetSortOrder(uiTable *t, int column, uiSortType order)
 	}
 }
 
-uiSortType uiTableColumnGetSortOrder(uiTable *t, int column)
+uiSortType uiTableColumnSortOrder(uiTable *t, int column)
 {
 	HWND lvhdr;
 	HDITEM hdri;

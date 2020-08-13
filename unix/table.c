@@ -342,7 +342,7 @@ unsigned uiprivTableColumnLogicalToReal(uiTable *t, int lcol)
 	return 0;
 }
 
-uiSortType uiTableColumnGetSortOrder(uiTable *t, int lcol)
+uiSortType uiTableColumnSortOrder(uiTable *t, int lcol)
 {
 	unsigned rcol = uiprivTableColumnLogicalToReal(t, lcol);
 	GtkTreeViewColumn *c = gtk_tree_view_get_column(t->tv, rcol);

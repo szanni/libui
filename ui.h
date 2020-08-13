@@ -1471,9 +1471,9 @@ _UI_EXTERN void uiTableColumnSetSortOrder(uiTable *t,
 	int column,
 	uiSortType order);
 
-// uiTableColumnGetSortOrder returns the sorting order of the specified
+// uiTableColumnSortOrder returns the sorting order of the specified
 // column
-_UI_EXTERN uiSortType uiTableColumnGetSortOrder(uiTable *t, int column);
+_UI_EXTERN uiSortType uiTableColumnSortOrder(uiTable *t, int column);
 
 // uiTableColumnHeaderOnClicked() sets a callback function to be called
 // when a table column header is clicked
