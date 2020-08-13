@@ -230,7 +230,7 @@ int uiprivTableProgress(uiTable *t, int item, int subitem, int modelColumn, LONG
 	return progress;
 }
 
-void uiTableColumnSetSortOrder(uiTable *t, int column, uiSortType order)
+void uiTableColumnSetSortOrder(uiTable *t, int column, uiSort order)
 {
 	HWND lvhdr;
 	HDITEM hdri;
@@ -255,7 +255,7 @@ void uiTableColumnSetSortOrder(uiTable *t, int column, uiSortType order)
 	}
 }
 
-uiSortType uiTableColumnSortOrder(uiTable *t, int column)
+uiSort uiTableColumnSortOrder(uiTable *t, int column)
 {
 	HWND lvhdr;
 	HDITEM hdri;

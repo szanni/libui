@@ -342,7 +342,7 @@ unsigned uiprivTableColumnLogicalToReal(uiTable *t, int lcol)
 	return 0;
 }
 
-uiSortType uiTableColumnSortOrder(uiTable *t, int lcol)
+uiSort uiTableColumnSortOrder(uiTable *t, int lcol)
 {
 	unsigned rcol = uiprivTableColumnLogicalToReal(t, lcol);
 	GtkTreeViewColumn *c = gtk_tree_view_get_column(t->tv, rcol);
@@ -356,7 +356,7 @@ uiSortType uiTableColumnSortOrder(uiTable *t, int lcol)
 		return uiSortDescending;
 }
 
-void uiTableColumnSetSortOrder(uiTable *t, int lcol, uiSortType order)
+void uiTableColumnSetSortOrder(uiTable *t, int lcol, uiSort order)
 {
 	unsigned rcol = uiprivTableColumnLogicalToReal(t, lcol);
 	GtkTreeViewColumn *c = gtk_tree_view_get_column(t->tv, rcol);

@@ -1385,7 +1385,7 @@ struct uiTableParams {
 	int RowBackgroundColorModelColumn;
 };
 
-_UI_ENUM(uiSortType) {
+_UI_ENUM(uiSort) {
 	uiSortAscending,
 	uiSortDescending,
 	uiSortNone,
@@ -1469,11 +1469,11 @@ _UI_EXTERN uiTable *uiNewTable(uiTableParams *params);
 // header
 _UI_EXTERN void uiTableColumnSetSortOrder(uiTable *t,
 	int column,
-	uiSortType order);
+	uiSort order);
 
 // uiTableColumnSortOrder returns the sorting order of the specified
 // column
-_UI_EXTERN uiSortType uiTableColumnSortOrder(uiTable *t, int column);
+_UI_EXTERN uiSort uiTableColumnSortOrder(uiTable *t, int column);
 
 // uiTableColumnHeaderOnClicked() sets a callback function to be called
 // when a table column header is clicked

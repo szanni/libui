@@ -242,7 +242,7 @@ uiTable *uiNewTable(uiTableParams *p)
 	return t;
 }
 
-uiSortType uiTableColumnSortOrder(uiTable *t, int lcol)
+uiSort uiTableColumnSortOrder(uiTable *t, int lcol)
 {
 	NSTableColumn *tc = [t->tv tableColumnWithIdentifier:[@(lcol) stringValue]];
 	NSString *si = [[t->tv indicatorImageInTableColumn:tc] name];
@@ -253,7 +253,7 @@ uiSortType uiTableColumnSortOrder(uiTable *t, int lcol)
 	return uiSortNone;
 }
 
-void uiTableColumnSetSortOrder(uiTable *t, int lcol, uiSortType order)
+void uiTableColumnSetSortOrder(uiTable *t, int lcol, uiSort order)
 {
 	NSTableColumn *tc = [t->tv tableColumnWithIdentifier:[@(lcol) stringValue]];
 	NSImage *img;
