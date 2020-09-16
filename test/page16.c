@@ -98,11 +98,39 @@ static void modelSetCellValue(uiTableModelHandler *mh, uiTableModel *m, int row,
 		checkStates[row] = uiTableValueInt(val);
 }
 
+uiLabel *columnID;
+uiCheckbox *header0Clickable;
+uiCheckbox *headersClickable;
+
+void header0ClickableToggled(uiCheckbox *c, void *data)
+{
+	uiTable *t = data;
+	uiTableHeaderSetClickable(t, 0, uiCheckboxChecked(c));
+	uiCheckboxSetChecked(c, uiTableHeaderClickable(t, 0));
+	uiCheckboxSetChecked(headersClickable, uiTableHeadersClickable(t));
+}
+
+void headersClickableToggled(uiCheckbox *c, void *data)
+{
+	uiTable *t = data;
+	uiTableHeadersSetClickable(t, uiCheckboxChecked(c));
+	uiCheckboxSetChecked(c, uiTableHeadersClickable(t));
+	uiCheckboxSetChecked(header0Clickable, uiTableHeaderClickable(t, 0));
+}
+
+void headerOnClicked(uiTable *table, int column, void *data)
+{
+	char str[30];
+	sprintf(str, "Clicked column %d", column);
+	uiLabelSetText(columnID, str);
+}
+
 static uiTableModel *m;
 
 uiBox *makePage16(void)
 {
 	uiBox *page16;
+	uiBox *controls;
 	uiTable *t;
 	uiTableParams p;
 	uiTableTextColumnOptionalParams tp;
@@ -119,6 +147,8 @@ uiBox *makePage16(void)
 	memset(checkStates, 0, 15 * sizeof (int));
 
 	page16 = newVerticalBox();
+	controls = newHorizontalBox();
+	uiBoxAppend(page16, uiControl(controls), 0);
 
 	mh.NumColumns = modelNumColumns;
 	mh.ColumnType = modelColumnType;
@@ -151,6 +181,20 @@ uiBox *makePage16(void)
 
 	uiTableAppendProgressBarColumn(t, "Progress Bar",
 		8);
+
+	header0Clickable = uiNewCheckbox("Header 0 clickable");
+	uiCheckboxSetChecked(header0Clickable, uiTableHeaderClickable(t, 0));
+	uiCheckboxOnToggled(header0Clickable, header0ClickableToggled, t);
+	uiBoxAppend(controls, uiControl(header0Clickable), 0);
+
+	headersClickable = uiNewCheckbox("Headers clickable");
+	uiCheckboxSetChecked(headersClickable, uiTableHeadersClickable(t));
+	uiCheckboxOnToggled(headersClickable, headersClickableToggled, t);
+	uiBoxAppend(controls, uiControl(headersClickable), 0);
+
+	columnID = uiNewLabel(NULL);
+	uiBoxAppend(controls, uiControl(columnID), 0);
+	uiTableHeaderOnClicked(t, headerOnClicked, NULL);
 
 	return page16;
 }

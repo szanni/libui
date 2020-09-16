@@ -18,6 +18,8 @@ struct uiTable {
 	// TODO document this properly
 	GHashTable *indeterminatePositions;
 	guint indeterminateTimer;
+	void (*columnHeaderOnClicked)(uiTable *, int, void *);
+	void *columnHeaderOnClickedData;
 };
 
 // use the same size as GtkFileChooserWidget's treeview
@@ -327,6 +329,49 @@ static void buttonColumnClicked(GtkCellRenderer *r, gchar *pathstr, gpointer dat
 	onEdited(p->m, p->modelColumn, pathstr, NULL, NULL);
 }
 
+int uiTableHeaderClickable(uiTable *t, int column)
+{
+	GtkTreeViewColumn *c = gtk_tree_view_get_column(t->tv, column);
+	return gtk_tree_view_column_get_clickable(c);
+}
+
+void uiTableHeaderSetClickable(uiTable *t, int column, int clickable)
+{
+	GtkTreeViewColumn *c = gtk_tree_view_get_column(t->tv, column);
+	gtk_tree_view_column_set_clickable(c, clickable);
+}
+
+int uiTableHeadersClickable(uiTable *t)
+{
+	return gtk_tree_view_get_headers_clickable(t->tv);
+}
+
+void uiTableHeadersSetClickable(uiTable *t, int clickable)
+{
+	gtk_tree_view_set_headers_clickable(t->tv, clickable);
+}
+
+void uiTableHeaderOnClicked(uiTable *t, void (*f)(uiTable *, int, void *), void *data)
+{
+	t->columnHeaderOnClicked = f;
+	t->columnHeaderOnClickedData = data;
+}
+
+static void defaultHeaderOnClicked(uiTable *table, int column, void *data)
+{
+	// do nothing
+}
+
+static void headerOnClicked(GtkTreeViewColumn *c, gpointer data)
+{
+	guint i;
+	uiTable *t = uiTable(data);
+
+	for (i = 0; i < gtk_tree_view_get_n_columns(t->tv); ++i)
+		if (gtk_tree_view_get_column(t->tv, i) == c)
+			t->columnHeaderOnClicked(t, i, t->columnHeaderOnClickedData);
+}
+
 static GtkTreeViewColumn *addColumn(uiTable *t, const char *name)
 {
 	GtkTreeViewColumn *c;
@@ -335,6 +380,8 @@ static GtkTreeViewColumn *addColumn(uiTable *t, const char *name)
 	gtk_tree_view_column_set_resizable(c, TRUE);
 	gtk_tree_view_column_set_title(c, name);
 	gtk_tree_view_append_column(t->tv, c);
+	uiTableHeaderOnClicked(t, defaultHeaderOnClicked, NULL);
+	g_signal_connect(c, "clicked", G_CALLBACK(headerOnClicked), t);
 	return c;
 }
 

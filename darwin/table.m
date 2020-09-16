@@ -16,6 +16,7 @@
 	uiTableModel *uiprivM;
 }
 - (id)initWithFrame:(NSRect)r uiprivT:(uiTable *)t uiprivM:(uiTableModel *)m;
+- (uiTable *)uiTable;
 @end
 
 @implementation uiprivTableView
@@ -28,6 +29,11 @@
 		self->uiprivM = m;
 	}
 	return self;
+}
+
+- (uiTable *)uiTable
+{
+	return self->uiprivT;
 }
 
 // TODO is this correct for overflow scrolling?
@@ -86,6 +92,12 @@ static void setBackgroundColor(uiprivTableView *t, NSTableRowView *rv, NSInteger
 - (void)tableView:(NSTableView *)tv didAddRowView:(NSTableRowView *)rv forRow:(NSInteger)row
 {
 	setBackgroundColor((uiprivTableView *) tv, rv, row);
+}
+
+- (void)tableView:(uiprivTableView *)tv didClickTableColumn:(NSTableColumn *) tc
+{
+	uiTable *t = [tv uiTable];
+	t->columnHeaderOnClicked(t, [[tc identifier] intValue], t->columnHeaderOnClickedData);
 }
 
 @end
@@ -170,6 +182,17 @@ static void uiTableDestroy(uiControl *c)
 	uiFreeControl(uiControl(t));
 }
 
+void uiTableColumnHeaderOnClicked(uiTable *t, void (*f)(uiTable *, int, void *), void *data)
+{
+	t->columnHeaderOnClicked = f;
+	t->columnHeaderOnClickedData = data;
+}
+
+static void defaultColumnHeaderOnClicked(uiTable *table, int column, void *data)
+{
+	// do nothing
+}
+
 uiTable *uiNewTable(uiTableParams *p)
 {
 	uiTable *t;
@@ -208,6 +231,8 @@ uiTable *uiNewTable(uiTableParams *p)
 	sp.HScroll = YES;
 	sp.VScroll = YES;
 	t->sv = uiprivMkScrollView(&sp, &(t->d));
+
+	uiTableColumnHeaderOnClicked(t, defaultColumnHeaderOnClicked, NULL);
 
 	// TODO WHY DOES THIS REMOVE ALL GRAPHICAL GLITCHES?
 	// I got the idea from http://jwilling.com/blog/optimized-nstableview-scrolling/ but that was on an unrelated problem I didn't seem to have (although I have small-ish tables to start with)

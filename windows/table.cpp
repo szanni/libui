@@ -230,6 +230,17 @@ int uiprivTableProgress(uiTable *t, int item, int subitem, int modelColumn, LONG
 	return progress;
 }
 
+void uiTableHeaderOnClicked(uiTable *t, void (*f)(uiTable *table, int column, void *data), void *data)
+{
+	t->columnHeaderOnClicked = f;
+	t->columnHeaderOnClickedData = data;
+}
+
+static void defaultColumnHeaderOnClicked(uiTable *table, int column, void *data)
+{
+	// do nothing
+}
+
 // TODO properly integrate compound statements
 static BOOL onWM_NOTIFY(uiControl *c, HWND hwnd, NMHDR *nmhdr, LRESULT *lResult)
 {
@@ -310,9 +321,20 @@ static BOOL onWM_NOTIFY(uiControl *c, HWND hwnd, NMHDR *nmhdr, LRESULT *lResult)
 			}
 			return FALSE;
 		}
+	case LVN_COLUMNCLICK:
+		{
+			NMLISTVIEW *nm = (NMLISTVIEW *) nmhdr;
+
+			hr = uiprivTableFinishEditingText(t);
+			if (hr != S_OK) {
+				// TODO
+				return FALSE;
+			}
+			t->columnHeaderOnClicked(t, nm->iSubItem, t->columnHeaderOnClickedData);
+			return TRUE;
+		}
 	// the real list view accepts changes when scrolling or clicking column headers
 	case LVN_BEGINSCROLL:
-	case LVN_COLUMNCLICK:
 		hr = uiprivTableFinishEditingText(t);
 		if (hr != S_OK) {
 			// TODO
@@ -490,6 +512,7 @@ uiTable *uiNewTable(uiTableParams *p)
 	t->columns = new std::vector<uiprivTableColumnParams *>;
 	t->model = p->Model;
 	t->backgroundColumn = p->RowBackgroundColorModelColumn;
+	uiTableColumnHeaderOnClicked(t, defaultColumnHeaderOnClicked, NULL);
 
 	// WS_CLIPCHILDREN is here to prevent drawing over the edit box used for editing text
 	t->hwnd = uiWindowsEnsureCreateControlHWND(WS_EX_CLIENTEDGE,

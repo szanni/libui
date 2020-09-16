@@ -1458,6 +1458,26 @@ _UI_EXTERN void uiTableAppendButtonColumn(uiTable *t,
 // uiNewTable() creates a new uiTable with the specified parameters.
 _UI_EXTERN uiTable *uiNewTable(uiTableParams *params);
 
+// uiTableHeaderClickable() return if the specific table header column
+// is clickable or not
+_UI_EXTERN int uiTableHeaderClickable(uiTable *t, int column);
+
+// uiTableHeaderSetClickable() set if an individual table header column
+// is clickable or not
+_UI_EXTERN void uiTableHeaderSetClickable(uiTable *t, int column, int clickable);
+
+// uiTableHeadersClickable() return if ALL table header columns are clickable or not
+_UI_EXTERN int uiTableHeadersClickable(uiTable *t);
+
+// uiTableHeadersSetClickable() make ALL table header columns clickable or not
+_UI_EXTERN void uiTableHeadersSetClickable(uiTable *t, int clickable);
+
+// uiTableColumnHeaderOnClicked() sets a callback function to be called
+// when the table header is clicked
+_UI_EXTERN void uiTableHeaderOnClicked(uiTable *t,
+	void (*f)(uiTable *table, int column, void *data),
+	void *data);
+
 #ifdef __cplusplus
 }
 #endif
