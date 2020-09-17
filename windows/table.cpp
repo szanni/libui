@@ -232,8 +232,8 @@ int uiprivTableProgress(uiTable *t, int item, int subitem, int modelColumn, LONG
 
 void uiTableHeaderOnClicked(uiTable *t, void (*f)(uiTable *table, int column, void *data), void *data)
 {
-	t->columnHeaderOnClicked = f;
-	t->columnHeaderOnClickedData = data;
+	t->headerOnClicked = f;
+	t->headerOnClickedData = data;
 }
 
 static void defaultHeaderOnClicked(uiTable *table, int column, void *data)
@@ -330,7 +330,8 @@ static BOOL onWM_NOTIFY(uiControl *c, HWND hwnd, NMHDR *nmhdr, LRESULT *lResult)
 				// TODO
 				return FALSE;
 			}
-			t->columnHeaderOnClicked(t, nm->iSubItem, t->columnHeaderOnClickedData);
+			if (t->columns->at(nm->iSubItem)->clickable)
+				t->headerOnClicked(t, nm->iSubItem, t->headerOnClickedData);
 			return TRUE;
 		}
 	// the real list view accepts changes when scrolling or clicking column headers
@@ -426,6 +427,7 @@ static uiprivTableColumnParams *appendColumn(uiTable *t, const char *name, int c
 	p->checkboxEditableModelColumn = -1;
 	p->progressBarModelColumn = -1;
 	p->buttonModelColumn = -1;
+	p->clickable = 1;
 	t->columns->push_back(p);
 	return p;
 }
@@ -503,12 +505,14 @@ void uiTableAppendButtonColumn(uiTable *t, const char *name, int buttonModelColu
 
 int uiTableHeaderClickable(uiTable *t, int column)
 {
-	return 0;
+	return t->columns->at(column)->clickable;
 }
 
 void uiTableHeaderSetClickable(uiTable *t, int column, int clickable)
 {
-
+	t->columns->at(column)->clickable = clickable;
+	if (clickable && !uiTableHeadersClickable(t))
+		uiTableHeadersSetClickable(t, 1);
 }
 
 int uiTableHeadersClickable(uiTable *t)
@@ -534,6 +538,8 @@ void uiTableHeadersSetClickable(uiTable *t, int clickable)
 		// a WINE bug or if this is broken on windows too
 		RedrawWindow(header, NULL, NULL, RDW_INVALIDATE);
 	}
+	for (auto c : *(t->columns))
+		c->clickable = clickable;
 }
 
 uiTable *uiNewTable(uiTableParams *p)

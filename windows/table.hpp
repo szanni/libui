@@ -22,6 +22,8 @@ struct uiprivTableColumnParams {
 
 	int buttonModelColumn;
 	int buttonClickableModelColumn;
+
+	int clickable;
 };
 struct uiTable {
 	uiWindowsControl c;
@@ -40,8 +42,8 @@ struct uiTable {
 	HWND edit;
 	int editedItem;
 	int editedSubitem;
-	void (*columnHeaderOnClicked)(uiTable *, int, void *);
-	void *columnHeaderOnClickedData;
+	void (*headerOnClicked)(uiTable *, int, void *);
+	void *headerOnClickedData;
 };
 extern int uiprivTableProgress(uiTable *t, int item, int subitem, int modelColumn, LONG *pos);
 
