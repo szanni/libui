@@ -94,10 +94,10 @@ static void setBackgroundColor(uiprivTableView *t, NSTableRowView *rv, NSInteger
 	setBackgroundColor((uiprivTableView *) tv, rv, row);
 }
 
-- (void)tableView:(uiprivTableView *)tv didClickTableColumn:(NSTableColumn *) tc
+- (void)tableView:(uiprivTableView *)tv didClickTableColumn:(NSTableColumn *)tc
 {
 	uiTable *t = [tv uiTable];
-	t->columnHeaderOnClicked(t, [[tc identifier] intValue], t->columnHeaderOnClickedData);
+	t->headerOnClicked(t, [[tc identifier] intValue], t->headerOnClickedData);
 }
 
 @end
@@ -182,13 +182,31 @@ static void uiTableDestroy(uiControl *c)
 	uiFreeControl(uiControl(t));
 }
 
-void uiTableColumnHeaderOnClicked(uiTable *t, void (*f)(uiTable *, int, void *), void *data)
+int uiTableHeaderClickable(uiTable *t, int column)
 {
-	t->columnHeaderOnClicked = f;
-	t->columnHeaderOnClickedData = data;
+	return 0;
 }
 
-static void defaultColumnHeaderOnClicked(uiTable *table, int column, void *data)
+void uiTableHeaderSetClickable(uiTable *t, int column, int clickable)
+{
+}
+
+int uiTableHeadersClickable(uiTable *t)
+{
+	return 1;
+}
+
+void uiTableHeadersSetClickable(uiTable *t, int clickable)
+{
+}
+
+void uiTableHeaderOnClicked(uiTable *t, void (*f)(uiTable *, int, void *), void *data)
+{
+	t->headerOnClicked = f;
+	t->headerOnClickedData = data;
+}
+
+static void defaultHeaderOnClicked(uiTable *table, int column, void *data)
 {
 	// do nothing
 }
@@ -232,7 +250,7 @@ uiTable *uiNewTable(uiTableParams *p)
 	sp.VScroll = YES;
 	t->sv = uiprivMkScrollView(&sp, &(t->d));
 
-	uiTableColumnHeaderOnClicked(t, defaultColumnHeaderOnClicked, NULL);
+	uiTableHeaderOnClicked(t, defaultHeaderOnClicked, NULL);
 
 	// TODO WHY DOES THIS REMOVE ALL GRAPHICAL GLITCHES?
 	// I got the idea from http://jwilling.com/blog/optimized-nstableview-scrolling/ but that was on an unrelated problem I didn't seem to have (although I have small-ish tables to start with)
