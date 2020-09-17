@@ -513,12 +513,27 @@ void uiTableHeaderSetClickable(uiTable *t, int column, int clickable)
 
 int uiTableHeadersClickable(uiTable *t)
 {
+	HWND header = ListView_GetHeader(t->hwnd);
+	if (header) {
+		LONG style = GetWindowLong(header, GWL_STYLE);
+		return (style & HDS_BUTTONS);
+	}
 	return 0;
 }
 
 void uiTableHeadersSetClickable(uiTable *t, int clickable)
 {
-
+	HWND header = ListView_GetHeader(t->hwnd);
+	if (header) {
+		LONG style = GetWindowLong(header, GWL_STYLE);
+		if (clickable)
+			SetWindowLong(header, GWL_STYLE, style | HDS_BUTTONS);
+		else
+			SetWindowLong(header, GWL_STYLE, style & ~HDS_BUTTONS);
+		// TODO check if this call is only needed with WINE and is hence
+		// a WINE bug or if this is broken on windows too
+		RedrawWindow(header, NULL, NULL, RDW_INVALIDATE);
+	}
 }
 
 uiTable *uiNewTable(uiTableParams *p)
