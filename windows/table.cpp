@@ -236,7 +236,7 @@ void uiTableHeaderOnClicked(uiTable *t, void (*f)(uiTable *table, int column, vo
 	t->columnHeaderOnClickedData = data;
 }
 
-static void defaultColumnHeaderOnClicked(uiTable *table, int column, void *data)
+static void defaultHeaderOnClicked(uiTable *table, int column, void *data)
 {
 	// do nothing
 }
@@ -501,6 +501,26 @@ void uiTableAppendButtonColumn(uiTable *t, const char *name, int buttonModelColu
 	p->buttonClickableModelColumn = buttonClickableModelColumn;
 }
 
+int uiTableHeaderClickable(uiTable *t, int column)
+{
+	return 0;
+}
+
+void uiTableHeaderSetClickable(uiTable *t, int column, int clickable)
+{
+
+}
+
+int uiTableHeadersClickable(uiTable *t)
+{
+	return 0;
+}
+
+void uiTableHeadersSetClickable(uiTable *t, int clickable)
+{
+
+}
+
 uiTable *uiNewTable(uiTableParams *p)
 {
 	uiTable *t;
@@ -512,7 +532,7 @@ uiTable *uiNewTable(uiTableParams *p)
 	t->columns = new std::vector<uiprivTableColumnParams *>;
 	t->model = p->Model;
 	t->backgroundColumn = p->RowBackgroundColorModelColumn;
-	uiTableColumnHeaderOnClicked(t, defaultColumnHeaderOnClicked, NULL);
+	uiTableHeaderOnClicked(t, defaultHeaderOnClicked, NULL);
 
 	// WS_CLIPCHILDREN is here to prevent drawing over the edit box used for editing text
 	t->hwnd = uiWindowsEnsureCreateControlHWND(WS_EX_CLIENTEDGE,

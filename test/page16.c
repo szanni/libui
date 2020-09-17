@@ -192,7 +192,7 @@ uiBox *makePage16(void)
 	uiCheckboxOnToggled(headersClickable, headersClickableToggled, t);
 	uiBoxAppend(controls, uiControl(headersClickable), 0);
 
-	columnID = uiNewLabel(NULL);
+	columnID = uiNewLabel("");
 	uiBoxAppend(controls, uiControl(columnID), 0);
 	uiTableHeaderOnClicked(t, headerOnClicked, NULL);
 
