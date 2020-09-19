@@ -1458,6 +1458,14 @@ _UI_EXTERN void uiTableAppendButtonColumn(uiTable *t,
 // uiNewTable() creates a new uiTable with the specified parameters.
 _UI_EXTERN uiTable *uiNewTable(uiTableParams *params);
 
+// uiTableColumnResizeable() return if a table column is user resizeable
+// or not
+_UI_EXTERN int uiTableColumnResizeable(uiTable *t, int column);
+
+// uiTableColumnSetResizeable() set if a table column is user resizeable
+// or not
+_UI_EXTERN void uiTableColumnSetResizeable(uiTable *t, int column, int resizeable);
+
 #ifdef __cplusplus
 }
 #endif

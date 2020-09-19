@@ -138,6 +138,11 @@ static LRESULT CALLBACK tableSubProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 			NMHEADERW *nm = (NMHEADERW *) nmhdr;
 
 			switch (nmhdr->code) {
+			case HDN_BEGINTRACKA:
+			case HDN_BEGINTRACKW:
+				if (!uiTableColumnResizeable(t, nm->iItem))
+					return TRUE;
+				break;
 			case HDN_ITEMCHANGED:
 				if ((nm->pitem->mask & HDI_WIDTH) == 0)
 					break;
@@ -184,6 +189,61 @@ static LRESULT CALLBACK tableSubProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 		if (hr != S_OK) {
 			// TODO
 		}
+	}
+	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
+}
+
+BOOL dividerDraggable(uiTable *t, HWND header, POINT point)
+{
+	BOOL rv = TRUE;
+	// We will extract information about the header
+	// using this structure
+	HD_ITEM item = {};
+	item.mask = HDI_WIDTH;	// We want the column width.
+
+	int dividerPosI = 0;
+
+	// Make divider width the width of the cursor. Inspired by:
+	// https://www.codeguru.com/cpp/controls/listview/columns/article.php/c1061/Prevent-column-resizing-2.htm
+	// WINE uses a value of 2*10 here, but that seems to break things.
+	int dividerWidth = GetSystemMetrics(SM_CXCURSOR);
+
+	for (int i = 0; i < Header_GetItemCount(header); ++i) {
+		Header_GetItem(header, i, &item);
+		dividerPosI += item.cxy;
+
+		if (!uiTableColumnResizeable(t, i)) {
+			if (point.x > dividerPosI - dividerWidth/2
+			&&  point.x < dividerPosI + dividerWidth/2)
+				rv = FALSE;
+		}
+	}
+
+	return rv;
+}
+
+static LRESULT CALLBACK headerSubProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIDSubclass, DWORD_PTR dwRefData)
+{
+	uiTable *t = (uiTable *) dwRefData;
+
+	switch (uMsg) {
+	// Do not display resizing mouse pointer over column separators
+	case WM_SETCURSOR:
+		{
+			POINT pos;
+			GetCursorPos(&pos);
+			ScreenToClient(hwnd, &pos);
+			if (!dividerDraggable(t, hwnd, pos))
+				return TRUE;
+			else
+				break;
+		}
+		// Inspired by: https://www.codeproject.com/Articles/11637/Locking-ListView-Column-Size
+		// how do we get the column ID here?
+		return TRUE;
+	// Stop the user from resizing by double clicking on the header
+	case WM_LBUTTONDBLCLK:
+		return 0;
 	}
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
@@ -404,6 +464,8 @@ static uiprivTableColumnParams *appendColumn(uiTable *t, const char *name, int c
 	p->checkboxEditableModelColumn = -1;
 	p->progressBarModelColumn = -1;
 	p->buttonModelColumn = -1;
+
+	p->resizeable = 1;
 	t->columns->push_back(p);
 	return p;
 }
@@ -516,7 +578,21 @@ uiTable *uiNewTable(uiTableParams *p)
 
 	t->indeterminatePositions = new std::map<std::pair<int, int>, LONG>;
 	if (SetWindowSubclass(t->hwnd, tableSubProc, 0, (DWORD_PTR) t) == FALSE)
-		logLastError(L"SetWindowSubclass()");
+		logLastError(L"SetWindowSubclass(Table)");
+
+	if (SetWindowSubclass(ListView_GetHeader(t->hwnd), headerSubProc, 0, (DWORD_PTR) t) == FALSE)
+		logLastError(L"SetWindowSubclass(Header)");
 
 	return t;
 }
+
+int uiTableColumnResizeable(uiTable *t, int column)
+{
+	return t->columns->at(column)->resizeable;
+}
+
+void uiTableColumnSetResizeable(uiTable *t, int column, int resizeable)
+{
+	t->columns->at(column)->resizeable = resizeable;
+}
+

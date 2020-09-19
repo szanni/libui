@@ -152,6 +152,8 @@ uiBox *makePage16(void)
 	uiTableAppendProgressBarColumn(t, "Progress Bar",
 		8);
 
+	uiTableColumnSetResizeable(t, 0, 0);
+
 	return page16;
 }
 

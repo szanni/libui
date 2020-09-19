@@ -22,6 +22,8 @@ struct uiprivTableColumnParams {
 
 	int buttonModelColumn;
 	int buttonClickableModelColumn;
+
+	int resizeable;
 };
 struct uiTable {
 	uiWindowsControl c;
