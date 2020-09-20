@@ -216,3 +216,19 @@ uiTable *uiNewTable(uiTableParams *p)
 
 	return t;
 }
+
+int uiTableColumnResizeable(uiTable *t, int column)
+{
+	NSTableColumn *tc = [t->tv tableColumnWithIdentifier:[@(column) stringValue]];
+	return [tc resizingMask] & NSTableColumnUserResizingMask;
+}
+
+void uiTableColumnSetResizeable(uiTable *t, int column, int resizeable)
+{
+	NSTableColumn *tc = [t->tv tableColumnWithIdentifier:[@(column) stringValue]];
+	if (resizeable)
+		[tc setResizingMask:([tc resizingMask] | NSTableColumnUserResizingMask)];
+	else
+		[tc setResizingMask:([tc resizingMask] & ~NSTableColumnUserResizingMask)];
+}
+
