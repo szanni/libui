@@ -522,3 +522,18 @@ uiTable *uiNewTable(uiTableParams *p)
 
 	return t;
 }
+
+int uiTableColumnResizeable(uiTable *t, int column)
+{
+	GtkTreeViewColumn *c = gtk_tree_view_get_column(t->tv, column);
+	return gtk_tree_view_column_get_resizable(c);
+}
+
+void uiTableColumnSetResizeable(uiTable *t, int column, int resizeable)
+{
+	// WARNING: this changes the behavior of GTK_TREE_VIEW_COLUMN_AUTOSIZE
+	// should we ever implement column auto sizing.
+	GtkTreeViewColumn *c = gtk_tree_view_get_column(t->tv, column);
+	gtk_tree_view_column_set_resizable(c, resizeable);
+}
+
