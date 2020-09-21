@@ -119,6 +119,11 @@ static void changedColumnWidth(uiSpinbox *s, void *data)
 	uiTableColumnSetWidth(t, uiSpinboxValue(columnID), uiSpinboxValue(columnWidth));
 }
 
+static void onRowDoubleClicked(uiTable *table, int row, void *data)
+{
+	printf("Double clicked row %d\n", row);
+}
+
 static uiTableModel *m;
 
 static void headerOnClicked(uiTable *t, int col, void *data)
@@ -208,6 +213,8 @@ uiBox *makePage16(void)
 
 	uiSpinboxOnChanged(columnID, changedColumnID, t);
 	uiSpinboxOnChanged(columnWidth, changedColumnWidth, t);
+
+	uiTableOnRowDoubleClicked(t, onRowDoubleClicked, NULL);
 
 	return page16;
 }
