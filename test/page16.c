@@ -107,6 +107,21 @@ void headerVisibleToggled(uiCheckbox *c, void *data)
 
 static uiTableModel *m;
 
+static void headerOnClicked(uiTable *t, int col, void *data)
+{
+	static int prev = 0;
+
+	if (prev != col)
+		uiTableHeaderSetSortIndicator(t, prev, uiSortNone);
+
+	if (uiTableHeaderSortIndicator(t, col) == uiSortAscending)
+		uiTableHeaderSetSortIndicator(t, col, uiSortDescending);
+	else
+		uiTableHeaderSetSortIndicator(t, col, uiSortAscending);
+
+	prev = col;
+}
+
 uiBox *makePage16(void)
 {
 	uiBox *page16;
@@ -167,6 +182,8 @@ uiBox *makePage16(void)
 	uiCheckboxSetChecked(headerVisible, uiTableHeaderVisible(t));
 	uiCheckboxOnToggled(headerVisible, headerVisibleToggled, t);
 	uiBoxAppend(controls, uiControl(headerVisible), 0);
+
+	uiTableHeaderOnClicked(t, headerOnClicked, NULL);
 
 	return page16;
 }
