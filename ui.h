@@ -1458,6 +1458,14 @@ _UI_EXTERN void uiTableAppendButtonColumn(uiTable *t,
 // uiNewTable() creates a new uiTable with the specified parameters.
 _UI_EXTERN uiTable *uiNewTable(uiTableParams *params);
 
+// uiTableColumnsReorderable() returns if table columns are user
+// reorderable
+_UI_EXTERN int uiTableColumnsReorderable(uiTable *t);
+
+// uiTableColumnsSetReorderable() sets if table columns are user
+// reorderable or not
+_UI_EXTERN void uiTableColumnsSetReorderable(uiTable *t, int reorderable);
+
 #ifdef __cplusplus
 }
 #endif

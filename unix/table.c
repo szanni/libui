@@ -18,6 +18,7 @@ struct uiTable {
 	// TODO document this properly
 	GHashTable *indeterminatePositions;
 	guint indeterminateTimer;
+	int columnsReorderable;
 };
 
 // use the same size as GtkFileChooserWidget's treeview
@@ -333,6 +334,7 @@ static GtkTreeViewColumn *addColumn(uiTable *t, const char *name)
 
 	c = gtk_tree_view_column_new();
 	gtk_tree_view_column_set_resizable(c, TRUE);
+	gtk_tree_view_column_set_reorderable(c, t->columnsReorderable);
 	gtk_tree_view_column_set_title(c, name);
 	gtk_tree_view_append_column(t->tv, c);
 	return c;
@@ -494,6 +496,26 @@ static void uiTableDestroy(uiControl *c)
 	uiFreeControl(uiControl(t));
 }
 
+int uiTableColumnsReorderable(uiTable *t)
+{
+	return t->columnsReorderable;
+}
+
+void uiTableColumnsSetReorderable(uiTable *t, int reorderable)
+{
+	guint i;
+	GtkTreeViewColumn *ci;
+
+	if (reorderable == t->columnsReorderable)
+		return;
+
+	t->columnsReorderable = reorderable;
+	for (i = 0; i < gtk_tree_view_get_n_columns(t->tv); ++i) {
+		ci = gtk_tree_view_get_column(t->tv, i);
+		gtk_tree_view_column_set_reorderable(ci, reorderable);
+	}
+}
+
 uiTable *uiNewTable(uiTableParams *p)
 {
 	uiTable *t;
@@ -512,6 +534,7 @@ uiTable *uiNewTable(uiTableParams *p)
 	t->treeWidget = gtk_tree_view_new_with_model(GTK_TREE_MODEL(t->model));
 	t->tv = GTK_TREE_VIEW(t->treeWidget);
 	// TODO set up t->tv
+	t->columnsReorderable = 0;
 
 	gtk_container_add(t->scontainer, t->treeWidget);
 	// and make the tree view visible; only the scrolled window's visibility is controlled by libui
