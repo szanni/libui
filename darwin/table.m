@@ -325,3 +325,13 @@ void uiTableColumnSetWidth(uiTable *t, int column, int width)
 	[tc setWidth: width];
 }
 
+int uiTableColumnsReorderable(uiTable *t)
+{
+	return [t->tv allowsColumnReordering];
+}
+
+void uiTableColumnsSetReorderable(uiTable *t, int reorderable)
+{
+	[t->tv setAllowsColumnReordering: reorderable];
+}
+

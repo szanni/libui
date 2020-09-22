@@ -22,6 +22,7 @@ struct uiTable {
 	void *headerOnClickedData;
 	void (*onRowDoubleClicked)(uiTable *, int, void *);
 	void *onRowDoubleClickedData;
+	int columnsReorderable;
 };
 
 // use the same size as GtkFileChooserWidget's treeview
@@ -390,6 +391,7 @@ static GtkTreeViewColumn *addColumn(uiTable *t, const char *name)
 
 	c = gtk_tree_view_column_new();
 	gtk_tree_view_column_set_resizable(c, TRUE);
+	gtk_tree_view_column_set_reorderable(c, t->columnsReorderable);
 	gtk_tree_view_column_set_title(c, name);
 	gtk_tree_view_column_set_clickable(c, 1);
 	g_signal_connect(c, "clicked", G_CALLBACK(headerOnClicked), t);
@@ -582,6 +584,26 @@ void uiTableOnRowDoubleClicked(uiTable *t, void (*f)(uiTable *, int, void *), vo
 	t->onRowDoubleClickedData = data;
 }
 
+int uiTableColumnsReorderable(uiTable *t)
+{
+	return t->columnsReorderable;
+}
+
+void uiTableColumnsSetReorderable(uiTable *t, int reorderable)
+{
+	guint i;
+	GtkTreeViewColumn *ci;
+
+	if (reorderable == t->columnsReorderable)
+		return;
+
+	t->columnsReorderable = reorderable;
+	for (i = 0; i < gtk_tree_view_get_n_columns(t->tv); ++i) {
+		ci = gtk_tree_view_get_column(t->tv, i);
+		gtk_tree_view_column_set_reorderable(ci, reorderable);
+	}
+}
+
 uiTable *uiNewTable(uiTableParams *p)
 {
 	uiTable *t;
@@ -603,6 +625,8 @@ uiTable *uiNewTable(uiTableParams *p)
 	// TODO set up t->tv
 	uiTableOnRowDoubleClicked(t, defaultOnRowDoubleClicked, NULL);
 	g_signal_connect(t->tv, "row-activated", G_CALLBACK(onRowDoubleClicked), t);
+
+	t->columnsReorderable = 0;
 
 	gtk_container_add(t->scontainer, t->treeWidget);
 	// and make the tree view visible; only the scrolled window's visibility is controlled by libui

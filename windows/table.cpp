@@ -618,3 +618,16 @@ void uiTableColumnSetWidth(uiTable *t, int column, int width)
 	ListView_SetColumnWidth(t->hwnd, column, width);
 }
 
+int uiTableColumnsReorderable(uiTable *t)
+{
+	return ListView_GetExtendedListViewStyle(t->hwnd) & LVS_EX_HEADERDRAGDROP;
+}
+
+void uiTableColumnsSetReorderable(uiTable *t, int reorderable)
+{
+	if (reorderable)
+		ListView_SetExtendedListViewStyleEx(t->hwnd, LVS_EX_HEADERDRAGDROP, LVS_EX_HEADERDRAGDROP);
+	else
+		ListView_SetExtendedListViewStyleEx(t->hwnd, LVS_EX_HEADERDRAGDROP, 0);
+}
+

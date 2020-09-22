@@ -124,6 +124,13 @@ static void onRowDoubleClicked(uiTable *table, int row, void *data)
 	printf("Double clicked row %d\n", row);
 }
 
+void columnsReorderableToggled(uiCheckbox *c, void *data)
+{
+	uiTable *t = data;
+	uiTableColumnsSetReorderable(t, uiCheckboxChecked(c));
+	uiCheckboxSetChecked(c, uiTableColumnsReorderable(t));
+}
+
 static uiTableModel *m;
 
 static void headerOnClicked(uiTable *t, int col, void *data)
@@ -146,6 +153,7 @@ uiBox *makePage16(void)
 	uiBox *page16;
 	uiBox *controls;
 	uiCheckbox *headerVisible;
+	uiCheckbox *columnsReorderable;
 	uiTable *t;
 	uiTableParams p;
 	uiTableTextColumnOptionalParams tp;
@@ -215,6 +223,11 @@ uiBox *makePage16(void)
 	uiSpinboxOnChanged(columnWidth, changedColumnWidth, t);
 
 	uiTableOnRowDoubleClicked(t, onRowDoubleClicked, NULL);
+
+	columnsReorderable = uiNewCheckbox("Columns Reorderable");
+	uiCheckboxSetChecked(columnsReorderable, uiTableColumnsReorderable(t));
+	uiCheckboxOnToggled(columnsReorderable, columnsReorderableToggled, t);
+	uiBoxAppend(controls, uiControl(columnsReorderable), 0);
 
 	return page16;
 }

@@ -1502,6 +1502,14 @@ _UI_EXTERN int uiTableColumnWidth(uiTable *t, int column);
 // uiTableColumnSetWidth() set table column width
 _UI_EXTERN void uiTableColumnSetWidth(uiTable *t, int column, int width);
 
+// uiTableColumnsReorderable() returns if table columns are user
+// reorderable
+_UI_EXTERN int uiTableColumnsReorderable(uiTable *t);
+
+// uiTableColumnsSetReorderable() sets if table columns are user
+// reorderable or not
+_UI_EXTERN void uiTableColumnsSetReorderable(uiTable *t, int reorderable);
+
 #ifdef __cplusplus
 }
 #endif
