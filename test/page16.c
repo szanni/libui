@@ -98,11 +98,20 @@ static void modelSetCellValue(uiTableModelHandler *mh, uiTableModel *m, int row,
 		checkStates[row] = uiTableValueInt(val);
 }
 
+void columnsReorderableToggled(uiCheckbox *c, void *data)
+{
+	uiTable *t = data;
+	uiTableColumnsSetReorderable(t, uiCheckboxChecked(c));
+	uiCheckboxSetChecked(c, uiTableColumnsReorderable(t));
+}
+
 static uiTableModel *m;
 
 uiBox *makePage16(void)
 {
 	uiBox *page16;
+	uiBox *controls;
+	uiCheckbox *columnsReorderable;
 	uiTable *t;
 	uiTableParams p;
 	uiTableTextColumnOptionalParams tp;
@@ -119,6 +128,8 @@ uiBox *makePage16(void)
 	memset(checkStates, 0, 15 * sizeof (int));
 
 	page16 = newVerticalBox();
+	controls = newHorizontalBox();
+	uiBoxAppend(page16, uiControl(controls), 0);
 
 	mh.NumColumns = modelNumColumns;
 	mh.ColumnType = modelColumnType;
@@ -151,6 +162,11 @@ uiBox *makePage16(void)
 
 	uiTableAppendProgressBarColumn(t, "Progress Bar",
 		8);
+
+	columnsReorderable = uiNewCheckbox("Columns Reorderable");
+	uiCheckboxSetChecked(columnsReorderable, uiTableColumnsReorderable(t));
+	uiCheckboxOnToggled(columnsReorderable, columnsReorderableToggled, t);
+	uiBoxAppend(controls, uiControl(columnsReorderable), 0);
 
 	return page16;
 }
