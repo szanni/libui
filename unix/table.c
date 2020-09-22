@@ -23,6 +23,7 @@ struct uiTable {
 	void (*onRowDoubleClicked)(uiTable *, int, void *);
 	void *onRowDoubleClickedData;
 	int columnsReorderable;
+	GPtrArray *columns;
 };
 
 // use the same size as GtkFileChooserWidget's treeview
@@ -332,6 +333,12 @@ static void buttonColumnClicked(GtkCellRenderer *r, gchar *pathstr, gpointer dat
 	onEdited(p->m, p->modelColumn, pathstr, NULL, NULL);
 }
 
+// Gets column by ID (index at time of insertion) instead of current index
+GtkTreeViewColumn* get_column_by_id(uiTable *t, int column)
+{
+	return g_ptr_array_index(t->columns, column);
+}
+
 uiSort uiTableHeaderSortIndicator(uiTable *t, int lcol)
 {
 	GtkTreeViewColumn *c = gtk_tree_view_get_column(t->tv, lcol);
@@ -396,6 +403,7 @@ static GtkTreeViewColumn *addColumn(uiTable *t, const char *name)
 	gtk_tree_view_column_set_clickable(c, 1);
 	g_signal_connect(c, "clicked", G_CALLBACK(headerOnClicked), t);
 	gtk_tree_view_append_column(t->tv, c);
+	g_ptr_array_add(t->columns, c);
 	return c;
 }
 
@@ -557,6 +565,7 @@ static void uiTableDestroy(uiControl *c)
 
 	for (i = 0; i < t->columnParams->len; i++)
 		uiprivFree(g_ptr_array_index(t->columnParams, i));
+	g_ptr_array_free(t->columns, TRUE);
 	g_ptr_array_free(t->columnParams, TRUE);
 	if (g_hash_table_size(t->indeterminatePositions) != 0)
 		g_source_remove(t->indeterminateTimer);
@@ -612,6 +621,7 @@ uiTable *uiNewTable(uiTableParams *p)
 
 	t->model = p->Model;
 	t->columnParams = g_ptr_array_new();
+	t->columns = g_ptr_array_new();
 	t->backgroundColumn = p->RowBackgroundColorModelColumn;
 
 	t->widget = gtk_scrolled_window_new(NULL, NULL);
