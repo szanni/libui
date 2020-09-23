@@ -216,3 +216,9 @@ uiTable *uiNewTable(uiTableParams *p)
 
 	return t;
 }
+
+int uiTableNumColumns(uiTable *t)
+{
+	return [t->tv numberOfColumns];
+}
+

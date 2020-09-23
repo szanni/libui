@@ -1458,6 +1458,9 @@ _UI_EXTERN void uiTableAppendButtonColumn(uiTable *t,
 // uiNewTable() creates a new uiTable with the specified parameters.
 _UI_EXTERN uiTable *uiNewTable(uiTableParams *params);
 
+// uiTableNumColumns() returns the number of columns in table t
+_UI_EXTERN int uiTableNumColumns(uiTable *t);
+
 #ifdef __cplusplus
 }
 #endif

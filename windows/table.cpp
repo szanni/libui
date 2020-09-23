@@ -520,3 +520,12 @@ uiTable *uiNewTable(uiTableParams *p)
 
 	return t;
 }
+
+int uiTableNumColumns(uiTable *t)
+{
+	HWND header = ListView_GetHeader(t->hwnd);
+	if (!header)
+		return 0;
+	return Header_GetItemCount(header);
+}
+

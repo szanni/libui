@@ -152,6 +152,8 @@ uiBox *makePage16(void)
 	uiTableAppendProgressBarColumn(t, "Progress Bar",
 		8);
 
+	printf("Number of table columns %d\n", uiTableNumColumns(t));
+
 	return page16;
 }
 

@@ -522,3 +522,9 @@ uiTable *uiNewTable(uiTableParams *p)
 
 	return t;
 }
+
+int uiTableNumColumns(uiTable *t)
+{
+	return gtk_tree_view_get_n_columns(t->tv);
+}
+
