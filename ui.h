@@ -1469,6 +1469,26 @@ _UI_EXTERN void uiTableColumnsSetReorderable(uiTable *t, int reorderable);
 // uiTableNumColumns() returns the number of columns in table t
 _UI_EXTERN int uiTableNumColumns(uiTable *t);
 
+// uiTableColumnOrder holds the order of columns in a uiTable.
+// It contains the number of columns and an array of integers specifying the
+// current position of each column in the uiTable. The numbers represent the
+// original index of the column when it was added.
+// E.g. [1, 0, 2] would indicate the first two columns where swapped.
+struct uiTableColumnOrder {
+	int numColumns;
+	int *order;
+};
+typedef struct uiTableColumnOrder uiTableColumnOrder;
+
+// uiTableColumnCurrentOrder() returns a uiTableColumnOrder which contains the
+// number of columns and an array of integers specifying the current position
+// of each column in the table.
+// The caller is responsible for calling uiTableColumnOrder when done.
+// When out of memory the function will return NULL.
+_UI_EXTERN uiTableColumnOrder* uiTableColumnCurrentOrder(uiTable *t);
+
+_UI_EXTERN void uiFreeTableColumnOrder(uiTableColumnOrder *order);
+
 #ifdef __cplusplus
 }
 #endif

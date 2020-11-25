@@ -100,9 +100,21 @@ static void modelSetCellValue(uiTableModelHandler *mh, uiTableModel *m, int row,
 
 void columnsReorderableToggled(uiCheckbox *c, void *data)
 {
+	int i;
 	uiTable *t = data;
 	uiTableColumnsSetReorderable(t, uiCheckboxChecked(c));
 	uiCheckboxSetChecked(c, uiTableColumnsReorderable(t));
+
+	uiTableColumnOrder *o = uiTableColumnCurrentOrder(t);
+	if (o == NULL)
+		return;
+
+	printf("[");
+	for (i = 0; i < o->numColumns; ++i)
+		printf("%d, ", o->order[i]);
+	printf("\b\b]\n");
+
+	uiFreeTableColumnOrder(o);
 }
 
 static uiTableModel *m;

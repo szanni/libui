@@ -330,12 +330,16 @@ static void buttonColumnClicked(GtkCellRenderer *r, gchar *pathstr, gpointer dat
 
 static GtkTreeViewColumn *addColumn(uiTable *t, const char *name)
 {
+	static int col = 0;
 	GtkTreeViewColumn *c;
 
 	c = gtk_tree_view_column_new();
 	gtk_tree_view_column_set_resizable(c, TRUE);
 	gtk_tree_view_column_set_reorderable(c, t->columnsReorderable);
 	gtk_tree_view_column_set_title(c, name);
+
+	g_object_set_data(G_OBJECT(c), "columnID", GINT_TO_POINTER(col));
+	printf("Adding col %d\n", col++);
 	gtk_tree_view_append_column(t->tv, c);
 	return c;
 }
@@ -549,5 +553,47 @@ uiTable *uiNewTable(uiTableParams *p)
 int uiTableNumColumns(uiTable *t)
 {
 	return gtk_tree_view_get_n_columns(t->tv);
+}
+
+static int uiTableColumn(uiTable *t, int column)
+{
+	GtkTreeViewColumn *c = gtk_tree_view_get_column(t->tv, column);
+	return GPOINTER_TO_INT(g_object_get_data(G_OBJECT(c), "columnID"));
+}
+
+static GtkTreeViewColumn* uiTableColumnById(uiTable *t, int columnID)
+{
+	int i;
+	GtkTreeViewColumn *c;
+
+	for (i = 0; i < uiTableNumColumns(t); ++i) {
+		c = gtk_tree_view_get_column(t->tv, i);
+		if (GPOINTER_TO_INT(g_object_get_data(G_OBJECT(c), "columnID") == columnID))
+			return c;
+	}
+	return NULL;
+}
+
+uiTableColumnOrder* uiTableColumnCurrentOrder(uiTable *t)
+{
+	int i;
+	uiTableColumnOrder *o;
+
+	o = uiprivNew(uiTableColumnOrder);
+	if (o == NULL)
+		return NULL;
+
+	o->numColumns = uiTableNumColumns(t);
+	o->order = uiprivAlloc(sizeof(*(o->order)) * o->numColumns, "int[]");
+	if (o->order == NULL) {
+		uiprivFree(o);
+		return NULL;
+	}
+
+	for (i = 0; i < o->numColumns; ++i) {
+		o->order[i] = uiTableColumn(t, i);
+	}
+
+	return o;
 }
 
