@@ -1466,6 +1466,9 @@ _UI_EXTERN int uiTableColumnsReorderable(uiTable *t);
 // reorderable or not
 _UI_EXTERN void uiTableColumnsSetReorderable(uiTable *t, int reorderable);
 
+// uiTableNumColumns() returns the number of columns in table t
+_UI_EXTERN int uiTableNumColumns(uiTable *t);
+
 #ifdef __cplusplus
 }
 #endif

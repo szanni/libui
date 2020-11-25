@@ -534,3 +534,11 @@ void uiTableColumnsSetReorderable(uiTable *t, int reorderable)
 		ListView_SetExtendedListViewStyleEx(t->hwnd, LVS_EX_HEADERDRAGDROP, 0);
 }
 
+int uiTableNumColumns(uiTable *t)
+{
+	HWND header = ListView_GetHeader(t->hwnd);
+	if (!header)
+		return 0;
+	return Header_GetItemCount(header);
+}
+

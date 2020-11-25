@@ -168,6 +168,8 @@ uiBox *makePage16(void)
 	uiCheckboxOnToggled(columnsReorderable, columnsReorderableToggled, t);
 	uiBoxAppend(controls, uiControl(columnsReorderable), 0);
 
+	printf("Number of table columns %d\n", uiTableNumColumns(t));
+
 	return page16;
 }
 

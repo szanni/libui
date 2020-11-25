@@ -227,3 +227,8 @@ void uiTableColumnsSetReorderable(uiTable *t, int reorderable)
 	[t->tv setAllowsColumnReordering: reorderable];
 }
 
+int uiTableNumColumns(uiTable *t)
+{
+	return [t->tv numberOfColumns];
+}
+
