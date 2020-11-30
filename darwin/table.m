@@ -232,3 +232,27 @@ int uiTableNumColumns(uiTable *t)
 	return [t->tv numberOfColumns];
 }
 
+uiTableColumnOrder* uiTableColumnCurrentOrder(uiTable *t)
+{
+	int i;
+	uiTableColumnOrder *o;
+
+	o = uiprivNew(uiTableColumnOrder);
+	if (o == NULL)
+		return NULL;
+
+	o->numColumns = uiTableNumColumns(t);
+	o->order = uiprivAlloc(sizeof(*(o->order)) * o->numColumns, "int[]");
+	if (o->order == NULL) {
+		uiprivFree(o);
+		return NULL;
+	}
+
+	NSArray *cols = [t->tv tableColumns];
+	for (i = 0; i < o->numColumns; ++i) {
+		o->order[i] = [[cols[i] identifier] intValue];
+	}
+
+	return o;
+}
+
