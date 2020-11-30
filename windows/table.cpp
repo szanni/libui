@@ -542,3 +542,23 @@ int uiTableNumColumns(uiTable *t)
 	return Header_GetItemCount(header);
 }
 
+uiTableColumnOrder* uiTableColumnCurrentOrder(uiTable *t)
+{
+	uiTableColumnOrder *o;
+
+	o = uiprivNew(uiTableColumnOrder);
+	if (o == NULL)
+		return NULL;
+
+	o->numColumns = uiTableNumColumns(t);
+	o->order = (int*) uiprivAlloc(sizeof(*(o->order)) * o->numColumns, "int[]");
+	if (o->order == NULL) {
+		uiprivFree(o);
+		return NULL;
+	}
+
+	ListView_GetColumnOrderArray(t->hwnd, o->numColumns, o->order);
+
+	return o;
+}
+
